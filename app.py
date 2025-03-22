@@ -14,10 +14,10 @@ class UserProfileCreate(BaseModel):
 
 
 @app.post("/person") 
-async def create_user_profile(data: UserProfileCreate): # Renamed function and parameter
+async def create_user_profile(data: UserProfileCreate): 
     
-    if not data.fullName or not data.occupation or not data.address: # Check new field names
-        return {"success": False, "result": {"error_message": "invalid profile request"}} # Slightly different error message
+    if not data.fullName or not data.occupation or not data.address: 
+        return {"success": False, "result": {"error_message": "invalid profile request"}} 
 
 
     new_entry = {
@@ -27,7 +27,7 @@ async def create_user_profile(data: UserProfileCreate): # Renamed function and p
     }
     data.append(new_entry)
 
-    return {"success": True, "result": new_entry} # Return success response
+    return {"success": True, "result": new_entry} 
 
 @app.get("/person") 
 async def get_user_profiles() -> List[Dict]: 
