@@ -1,39 +1,35 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from typing import List, Dict
+
 
 app = FastAPI()
 
-data = []
+data: List[Dict] = []
 
-@app.get("/person")
-async def get_people():
-    return data
+class UserProfileCreate(BaseModel):
+    fullName: str 
+    occupation: str     
+    address: str 
 
 
-# This is a route for POST requests to /person.
-# It's used to add new person data to our 'data' list.
-@app.post("/person")
-async def add_person(person_data: dict):  # We expect a dictionary as input
+@app.post("/person") 
+async def create_user_profile(data: UserProfileCreate): # Renamed function and parameter
+    
+    if not data.fullName or not data.occupation or not data.address: # Check new field names
+        return {"success": False, "result": {"error_message": "invalid profile request"}} # Slightly different error message
 
-    # Let's check if the request data has the required keys: 'name', 'occupation', 'address'
-    if "name" in person_data and "occupation" in person_data and "address" in person_data:
-        name = person_data["name"]
-        occupation = person_data["occupation"]
-        address = person_data["address"]
 
-        # Now, let's check if the values for name, occupation, and address are not empty strings.
-        if name and occupation and address:  # Short way to check if strings are not empty
-            new_person = {
-                "name": name,
-                "occupation": occupation,
-                "address": address
-            }
-            data.append(new_person)  # Add the new person to our data list
+    new_entry = {
+        "name": data.fullName ,
+        "occupation": data.occupation,
+        "address": data.address
+    }
+    data.append(new_entry)
 
-            # Return a success response
-            return {"success": True, "result": new_person}
-        else:
-            # If any of the values are empty, it's an invalid request
-            return {"success": False, "result": {"error_message": "invalid request - fields cannot be empty"}}
-    else:
-        # If any of the required keys are missing in the request, it's also an invalid request
-        return {"success": False, "result": {"error_message": "invalid request - missing required keys (name, occupation, address)"}}
+    return {"success": True, "result": new_entry} # Return success response
+
+@app.get("/person") 
+async def get_user_profiles() -> List[Dict]: 
+    
+    return data 
